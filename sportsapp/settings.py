@@ -22,16 +22,13 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
 DEBUG = os.environ.get('DJANGO_DEBUG', '1') == '1'
 SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY')
 if not SECRET_KEY:
     if not DEBUG:
         raise ImproperlyConfigured('Configure a private Django signing key.')
+    # Local-only fallback: sessions reset on every restart, which is fine for development.
     SECRET_KEY = secrets.token_urlsafe(48)
-
-# SECURITY WARNING: don't run with debug turned on in production!
-
 
 ALLOWED_HOSTS = os.environ.get('DJANGO_ALLOWED_HOSTS', 'localhost,127.0.0.1,[::1]').split(',')
 
@@ -63,7 +60,7 @@ ROOT_URLCONF = 'sportsapp.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR/'templates/sports'],
+        'DIRS': [BASE_DIR / 'templates/sports'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
