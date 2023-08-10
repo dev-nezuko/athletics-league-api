@@ -10,14 +10,14 @@ from .views import (
     PlayerDetailView,
     PlayerUpdateView,
     PlayerDeleteView,
-    LoginView,
+    SignInView,
     SignUpView,
     LogoutView,
-    Test,
+    HomeView,
 )
 
 urlpatterns = [
-    path('', Test.as_view(), name='home'),
+    path('', HomeView.as_view(), name='home'),
     path('team/', TeamListView.as_view(), name='team_list'),
     path('team/new/', TeamCreateView.as_view(), name='team_create'),
     path('team/<int:pk>/', TeamDetailView.as_view(), name='team_detail'),
@@ -30,9 +30,7 @@ urlpatterns = [
     path('player/<int:pk>/update/', PlayerUpdateView.as_view(), name='player_update'),
     path('player/<int:pk>/delete/', PlayerDeleteView.as_view(), name='player_delete'),
 
-    path('login/', LoginView.as_view(), name='login'),
+    path('login/', SignInView.as_view(), name='login'),
     path('logout/', LogoutView.as_view(), name='logout'),
     path('signup/', SignUpView.as_view(), name='signup'),
-
 ]
-

@@ -10,13 +10,13 @@ from django.shortcuts import render, redirect
 from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin
 from .forms import TeamForm, PlayerForm
-from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
+from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.views import LoginView
 from django.contrib.auth import logout
 from .models import Team, Player
 
 
-class Test(LoginRequiredMixin, View):
+class HomeView(LoginRequiredMixin, View):
     def get(self, request):
         return render(request, "index.html")
 
@@ -92,11 +92,15 @@ class SignUpView(CreateView):
     success_url = reverse_lazy("login")
     template_name = "signup.html"
 
+    def dispatch(self, request, *args, **kwargs):
+        if request.user.is_authenticated:
+            return redirect("home")
+        return super().dispatch(request, *args, **kwargs)
 
-class LoginView(LoginView):
-    form_class = AuthenticationForm
-    success_url = reverse_lazy("team_list")
+
+class SignInView(LoginView):
     template_name = "login.html"
+    redirect_authenticated_user = True
 
 
 class LogoutView(LoginRequiredMixin, View):

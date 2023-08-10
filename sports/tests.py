@@ -39,3 +39,39 @@ class RosterTests(TestCase):
         with self.assertNumQueries(2):
             rows=list(PlayerListView.queryset.all())
             for row in rows:list(row.teams.all())
+
+
+class AccountPageTests(TestCase):
+    def test_login_page_renders_form_for_visitors(self):
+        response = self.client.get(reverse("login"))
+        self.assertContains(response, 'name="username"')
+
+    def test_signup_page_renders_form_for_visitors(self):
+        response = self.client.get(reverse("signup"))
+        self.assertContains(response, 'name="password1"')
+
+    def test_signed_in_user_is_sent_away_from_login_and_signup(self):
+        user = User.objects.create_user("demo-coach", password="local-test-password")
+        self.client.force_login(user)
+        self.assertRedirects(self.client.get(reverse("login")), "/team/")
+        self.assertRedirects(self.client.get(reverse("signup")), reverse("home"))
+
+
+class PlayerFormTests(TestCase):
+    def setUp(self):
+        user = User.objects.create_user("demo-coach", password="local-test-password")
+        self.client.force_login(user)
+
+    def test_player_can_be_saved_without_a_team(self):
+        response = self.client.post(
+            reverse("player_create"), {"first_name": "Robin", "last_name": "Sample"}
+        )
+        self.assertRedirects(response, reverse("player_list"))
+        self.assertFalse(Player.objects.get(last_name="Sample").teams.exists())
+
+    def test_team_detail_links_each_player(self):
+        team = Team.objects.create(city="Harbor", mascot="Gulls")
+        player = Player.objects.create(first_name="Jo", last_name="Placeholder")
+        player.teams.add(team)
+        response = self.client.get(reverse("team_detail", args=[team.pk]))
+        self.assertContains(response, reverse("player_detail", args=[player.pk]))

@@ -10,7 +10,7 @@ class Team(models.Model):
 class Player(models.Model):
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100)
-    teams = models.ManyToManyField(Team)
+    teams = models.ManyToManyField(Team, blank=True)
 
     def __str__(self):
         return f"{self.first_name} {self.last_name}"
