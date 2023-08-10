@@ -1,4 +1,22 @@
 {% extends 'base.html' %}
-{% block content %}<p class="eyebrow">Player profile</p><h1>{{ player.first_name }} {{ player.last_name }}</h1>
-<h2>Teams</h2><ul>{% for team in player.teams.all %}<li><a href="{% url 'team_detail' team.pk %}">{{ team }}</a></li>{% empty %}<li>No team memberships.</li>{% endfor %}</ul>
-<a href="{% url 'player_update' player.pk %}">Edit player</a> · <a href="{% url 'player_list' %}">Back to players</a>{% endblock %}
+{% block title %}{{ player }}{% endblock %}
+{% block content %}
+  <div class="page-head">
+    <div><p class="eyebrow">Player profile</p><h1>{{ player.first_name }} {{ player.last_name }}</h1></div>
+    <div class="actions">
+      <a class="btn btn-quiet" href="{% url 'player_update' player.pk %}">Edit player</a>
+      <a class="btn btn-danger" href="{% url 'player_delete' player.pk %}">Delete player</a>
+    </div>
+  </div>
+  <div class="panel">
+    <h2>Teams</h2>
+    {% with teams=player.teams.all %}
+      {% if teams %}
+        <ul class="tags">{% for team in teams %}<li><a href="{% url 'team_detail' team.pk %}">{{ team }}</a></li>{% endfor %}</ul>
+      {% else %}
+        <p class="free-agent">No team memberships.</p>
+      {% endif %}
+    {% endwith %}
+  </div>
+  <p><a href="{% url 'player_list' %}">Back to players</a></p>
+{% endblock %}

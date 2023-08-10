@@ -1,4 +1,51 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Club roster</title>
-<style>
-*{box-sizing:border-box}body{margin:0;background:#f3f6f4;color:#20352d;font:16px/1.6 system-ui,sans-serif}header{background:#173c30;color:white;padding:22px 5vw}nav{display:flex;flex-wrap:wrap;align-items:center;gap:20px}nav a{color:white;text-decoration:none}nav strong{font-size:22px;margin-right:auto}nav form{margin:0}main{max-width:1100px;margin:45px auto;padding:0 24px}h1{font-size:clamp(30px,5vw,44px);line-height:1.2;margin:12px 0 24px}.eyebrow{text-transform:uppercase;letter-spacing:.15em;font-size:12px;color:#526e60}a{color:#165741}table{border-collapse:collapse;width:100%;background:white;border-radius:12px}th,td{text-align:left;padding:16px;border-bottom:1px solid #e2e8e4}th{color:#456052}td a{margin-right:12px}button,input[type=submit],.btn{background:#1c654c;color:white;border:0;border-radius:6px;padding:10px 16px;cursor:pointer;font:inherit}nav button{background:#315d4b}input:not([type=submit]),select{max-width:100%;padding:9px;border:1px solid #a8bbb0;border-radius:5px;font:inherit}label{display:block;font-weight:600}form p{margin:18px 0}.helptext{display:block;color:#526e60;font-size:14px}.errorlist{color:#a22929}.table-wrap{overflow-x:auto}footer{max-width:1100px;margin:60px auto;padding:0 24px;color:#526e60;font-size:14px}
-</style></head><body><header><nav aria-label="Main"><strong><a href="{% url 'home' %}">Club roster</a></strong><a href="{% url 'team_list' %}">Teams</a><a href="{% url 'player_list' %}">Players</a>{% if user.is_authenticated %}<span>{{ user.username }}</span><form method="post" action="{% url 'logout' %}">{% csrf_token %}<button>Log out</button></form>{% else %}<a href="{% url 'login' %}">Log in</a><a href="{% url 'signup' %}">Create account</a>{% endif %}</nav></header><main>{% block content %}{% endblock %}</main><footer>One shared club directory · teams and player memberships</footer></body></html>
+{% load static %}<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Club roster{% endblock %} · Club roster</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Barlow:wght@400;600&display=swap">
+  <link rel="stylesheet" href="{% static 'sports/site.css' %}">
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header">
+    {% with current=request.resolver_match.url_name|default:"" %}
+    <nav class="site-nav" aria-label="Main">
+      <a class="brand" href="{% url 'home' %}"><span>CR</span>Club roster</a>
+      {% if user.is_authenticated %}
+        <a href="{% url 'team_list' %}"{% if current|slice:":4" == "team" %} aria-current="page"{% endif %}>Teams</a>
+        <a href="{% url 'player_list' %}"{% if current|slice:":6" == "player" %} aria-current="page"{% endif %}>Players</a>
+        <span class="who">Signed in as {{ user.username }}</span>
+        <form method="post" action="{% url 'logout' %}">{% csrf_token %}<button type="submit">Log out</button></form>
+      {% else %}
+        <a href="{% url 'login' %}"{% if current == "login" %} aria-current="page"{% endif %}>Log in</a>
+        <a href="{% url 'signup' %}"{% if current == "signup" %} aria-current="page"{% endif %}>Create account</a>
+      {% endif %}
+    </nav>
+    {% endwith %}
+  </header>
+  <main id="main" tabindex="-1">
+    {% if messages %}
+      <div role="status">
+        {% for message in messages %}<p class="alert">{{ message }}</p>{% endfor %}
+      </div>
+    {% endif %}
+    {% block content %}{% endblock %}
+  </main>
+  <footer class="site-footer">One shared club directory: teams, athletes and who runs for whom.</footer>
+  <script>
+    document.addEventListener("submit", function (event) {
+      var button = event.target.querySelector("button[type=submit]");
+      if (button && !button.hasAttribute("aria-busy")) {
+        button.setAttribute("aria-busy", "true");
+        button.dataset.label = button.textContent;
+        button.textContent = "Working…";
+        setTimeout(function () { button.disabled = true; }, 0);
+      }
+    });
+  </script>
+</body>
+</html>

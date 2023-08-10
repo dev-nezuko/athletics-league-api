@@ -1,35 +1,39 @@
 {% extends 'base.html' %}
-
+{% block title %}Players{% endblock %}
 {% block content %}
-  <h1>Players</h1>
-  <p><a href="{% url 'player_create' %}">Add new player</a></p>
-  <div class="table-wrap"><table class="table">
-    <thead class="thead-dark">
-      <tr>
-        <th scope="col">First Name</th>
-        <th scope="col">Last Name</th>
-        <th scope="col">Teams</th>
-        <th scope="col">Actions</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for player in players %}
-        <tr>
-          <th scope="row">{{ player.first_name }}</th>
-          <td>{{ player.last_name }}</td>
-          <td>
-            {% for team in player.teams.all %}
-              {{ team.city }} {{ team.mascot }}{% if not forloop.last %}, {% endif %}
-            {% endfor %}
-          </td>
-          <td>
-            <a class="text-info" href="{% url 'player_detail' player.id %}">Details</a>
-            <a class="text-warning" href="{% url 'player_update' player.id %}">Edit</a>
-            <a class="text-danger" href="{% url 'player_delete' player.id %}">Delete</a>
-          </td>
-        </tr>
-      {% empty %}<tr><td colspan="4">No players yet. Add one to start the directory.</td></tr>{% endfor %}
-    </tbody>
-  </table></div>
-  {% include '_pagination.html' %}
+  <div class="page-head">
+    <div><p class="eyebrow">Directory</p><h1>Players</h1></div>
+    <a class="btn" href="{% url 'player_create' %}">Add a player</a>
+  </div>
+  {% if players %}
+    <table class="board">
+      <caption class="board-caption">Sorted by surname</caption>
+      <thead>
+        <tr><td class="lane" aria-hidden="true"></td><th scope="col">Name</th><th scope="col">Teams</th><th scope="col"><span class="visually-hidden">Actions</span></th></tr>
+      </thead>
+      <tbody>
+        {% for player in players %}
+          <tr>
+            <td class="lane" aria-hidden="true">{{ page_obj.start_index|add:forloop.counter0 }}</td>
+            <th scope="row"><a href="{% url 'player_detail' player.pk %}">{{ player.last_name }}, {{ player.first_name }}</a></th>
+            <td data-label="Teams">
+              {% if player.teams.all %}
+                <ul class="tags">{% for team in player.teams.all %}<li><a href="{% url 'team_detail' team.pk %}">{{ team }}</a></li>{% endfor %}</ul>
+              {% else %}<span class="free-agent">No team</span>{% endif %}
+            </td>
+            <td class="row-actions">
+              <a href="{% url 'player_update' player.pk %}" aria-label="Edit {{ player }}">Edit</a>
+              <a href="{% url 'player_delete' player.pk %}" aria-label="Delete {{ player }}">Delete</a>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% include '_pagination.html' %}
+  {% else %}
+    <div class="empty">
+      <p>No players yet. Add one to start the directory.</p>
+      <a class="btn" href="{% url 'player_create' %}">Add a player</a>
+    </div>
+  {% endif %}
 {% endblock %}

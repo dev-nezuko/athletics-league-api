@@ -1,10 +1,22 @@
 {% extends 'base.html' %}
-
+{% block title %}Overview{% endblock %}
 {% block content %}
-  <div class="roster-home">
-    <h1>Teams and Players</h1>
-    <p>{{ team_count }} team{{ team_count|pluralize }}, {{ player_count }} player{{ player_count|pluralize }}, {{ unassigned_count }} without a team.</p>
-    <a type="button" class="btn btn-primary" href="{% url 'team_create' %}">Add a team</a>
-    <a type="button" class="btn btn-primary" href="{% url 'player_create' %}">Add a Player</a>
+  <p class="eyebrow">League overview</p>
+  <h1>Teams and players</h1>
+  <div class="scoreboard">
+    <a href="{% url 'team_list' %}"><strong>{{ team_count }}</strong><span>Team{{ team_count|pluralize }}</span></a>
+    <a href="{% url 'player_list' %}"><strong>{{ player_count }}</strong><span>Player{{ player_count|pluralize }}</span></a>
+    <a href="{% url 'player_list' %}"><strong>{{ unassigned_count }}</strong><span>Without a team</span></a>
   </div>
+  {% if not team_count and not player_count %}
+    <div class="empty">
+      <p>The directory is empty. Start with a team, then add players to it.</p>
+      <a class="btn" href="{% url 'team_create' %}">Add a team</a>
+    </div>
+  {% else %}
+    <div class="actions">
+      <a class="btn" href="{% url 'team_create' %}">Add a team</a>
+      <a class="btn btn-quiet" href="{% url 'player_create' %}">Add a player</a>
+    </div>
+  {% endif %}
 {% endblock %}

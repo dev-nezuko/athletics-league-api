@@ -1,1 +1,10 @@
-{% extends 'base.html' %}{% block content %}<h1>500 · Something went wrong</h1><p>Try again later or return to the roster.</p><a href="{% url 'home' %}">Return home</a>{% endblock %}
+{% extends 'base.html' %}
+{% block title %}Server error{% endblock %}
+{% block content %}
+  <div class="error-page">
+    <p class="code" aria-hidden="true">500</p>
+    <h1>Something went wrong</h1>
+    <p class="lede">The server hit an error. Try again in a moment.</p>
+    <a class="btn" href="{% url 'home' %}">Back to the overview</a>
+  </div>
+{% endblock %}

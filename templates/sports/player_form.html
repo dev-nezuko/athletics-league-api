@@ -1,1 +1,17 @@
-{% extends 'base.html' %}{% block content %}<p class="eyebrow">Roster management</p><h1>{% if object %}Edit{% else %}Add{% endif %} player</h1><form method="post">{% csrf_token %}{{ form.as_p }}<button>Save player</button></form>{% endblock %}
+{% extends 'base.html' %}
+{% block title %}{% if object %}Edit{% else %}Add{% endif %} player{% endblock %}
+{% block content %}
+  <p class="eyebrow">Roster management</p>
+  <h1>{% if object %}Edit {{ object }}{% else %}Add a player{% endif %}</h1>
+  <div class="panel">
+    {% include '_form_errors.html' %}
+    <form method="post" novalidate>
+      {% csrf_token %}
+      {{ form.as_div }}
+      <div class="actions">
+        <button type="submit">Save player</button>
+        <a href="{% if object %}{% url 'player_detail' object.pk %}{% else %}{% url 'player_list' %}{% endif %}">Cancel</a>
+      </div>
+    </form>
+  </div>
+{% endblock %}

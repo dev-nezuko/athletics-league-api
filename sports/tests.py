@@ -151,3 +151,45 @@ class SeedDemoCommandTests(TestCase):
         self.assertEqual(Team.objects.count(), 4)
         self.assertEqual(Player.objects.count(), 9)
         self.assertTrue(Player.objects.filter(teams__isnull=True).exists())
+
+
+class InterfaceTests(TestCase):
+    def setUp(self):
+        user = User.objects.create_user("demo-coach", password="local-test-password")
+        self.client.force_login(user)
+
+    def test_saving_a_team_flashes_its_name(self):
+        response = self.client.post(
+            reverse("team_create"), {"city": "Fenwick", "mascot": "Foxes"}, follow=True
+        )
+        self.assertContains(response, "Added Fenwick Foxes.")
+
+    def test_deleting_a_player_flashes_its_name(self):
+        player = Player.objects.create(first_name="Ash", last_name="Nobody")
+        response = self.client.post(reverse("player_delete", args=[player.pk]), follow=True)
+        self.assertContains(response, "Deleted Ash Nobody.")
+
+    def test_player_form_offers_teams_as_labelled_checkboxes(self):
+        team = Team.objects.create(city="Fenwick", mascot="Foxes")
+        response = self.client.get(reverse("player_create"))
+        self.assertContains(response, 'type="checkbox"')
+        self.assertContains(response, "<legend")
+        self.assertContains(response, str(team))
+
+    def test_invalid_form_shows_error_summary(self):
+        response = self.client.post(reverse("team_create"), {"city": "", "mascot": ""})
+        self.assertContains(response, 'role="alert"')
+        self.assertContains(response, 'aria-invalid="true"')
+
+    def test_current_section_is_marked_in_navigation(self):
+        response = self.client.get(reverse("player_list"))
+        self.assertContains(response, 'href="/player/" aria-current="page"')
+
+    def test_empty_lists_show_a_call_to_action(self):
+        response = self.client.get(reverse("team_list"))
+        self.assertContains(response, "No teams yet")
+
+    @override_settings(DEBUG=False)
+    def test_404_page_uses_site_layout(self):
+        response = self.client.get("/missing-page/")
+        self.assertContains(response, "Off the track", status_code=404)

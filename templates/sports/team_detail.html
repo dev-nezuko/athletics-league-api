@@ -1,19 +1,23 @@
 {% extends 'base.html' %}
-
+{% block title %}{{ team }}{% endblock %}
 {% block content %}
-  <h1>Team Detail</h1>
-  <p><strong>City:</strong> {{ team.city }}</p>
-  <p><strong>Mascot:</strong> {{ team.mascot }}</p>
-
-  <h2>Players:</h2>
-  <ul>
-    {% for player in roster %}
-      <li><a href="{% url 'player_detail' player.pk %}">{{ player.first_name }} {{ player.last_name }}</a></li>
-    {% empty %}
-      <li>No players currently on this team</li>
-    {% endfor %}
-  </ul>
-
-  <a href="{% url 'team_update' team.id %}">Update</a>
-  <a href="{% url 'team_delete' team.id %}">Delete</a>
+  <div class="page-head">
+    <div><p class="eyebrow">{{ team.city }}</p><h1>{{ team }}</h1></div>
+    <div class="actions">
+      <a class="btn btn-quiet" href="{% url 'team_update' team.pk %}">Edit team</a>
+      <a class="btn btn-danger" href="{% url 'team_delete' team.pk %}">Delete team</a>
+    </div>
+  </div>
+  <div class="panel">
+    <h2>Roster ({{ roster|length }})</h2>
+    {% if roster %}
+      <ul class="roster">
+        {% for player in roster %}<li><a href="{% url 'player_detail' player.pk %}">{{ player.first_name }} {{ player.last_name }}</a></li>{% endfor %}
+      </ul>
+    {% else %}
+      <p class="free-agent">No players on this team yet.</p>
+      <a class="btn" href="{% url 'player_create' %}">Add a player</a>
+    {% endif %}
+  </div>
+  <p><a href="{% url 'team_list' %}">Back to teams</a></p>
 {% endblock %}

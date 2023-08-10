@@ -1,30 +1,35 @@
 {% extends 'base.html' %}
-
+{% block title %}Teams{% endblock %}
 {% block content %}
-  <h1>Teams</h1>
-  <p><a href="{% url 'team_create' %}">Add a team</a></p>
-  <div class="table-wrap"><table class="table">
-    <thead class="thead-dark">
-      <tr>
-        <th scope="col">City</th>
-        <th scope="col">Mascot</th>
-        <th scope="col">Actions</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for team in teams %}
-        <tr>
-          <th scope="row"><a href="{% url 'team_detail' team.pk %}">{{ team.city }}</a></th>
-          <td>{{ team.mascot }}</td>
-          <td>
-            <a class="text-warning" href="{% url 'team_update' team.pk %}">Edit</a>
-            <a class="text-danger" href="{% url 'team_delete' team.pk %}">Delete</a>
-          </td>
-        </tr>
-      {% empty %}<tr><td colspan="3">No teams yet. Add one to start the directory.</td></tr>{% endfor %}
-
-    </tbody>
-  </table></div>
-  {% include '_pagination.html' %}
-  
+  <div class="page-head">
+    <div><p class="eyebrow">Directory</p><h1>Teams</h1></div>
+    <a class="btn" href="{% url 'team_create' %}">Add a team</a>
+  </div>
+  {% if teams %}
+    <table class="board">
+      <caption class="board-caption">Sorted by city</caption>
+      <thead>
+        <tr><td class="lane" aria-hidden="true"></td><th scope="col">City</th><th scope="col">Mascot</th><th scope="col"><span class="visually-hidden">Actions</span></th></tr>
+      </thead>
+      <tbody>
+        {% for team in teams %}
+          <tr>
+            <td class="lane" aria-hidden="true">{{ page_obj.start_index|add:forloop.counter0 }}</td>
+            <th scope="row"><a href="{% url 'team_detail' team.pk %}">{{ team.city }}</a></th>
+            <td data-label="Mascot">{{ team.mascot }}</td>
+            <td class="row-actions">
+              <a href="{% url 'team_update' team.pk %}" aria-label="Edit {{ team }}">Edit</a>
+              <a href="{% url 'team_delete' team.pk %}" aria-label="Delete {{ team }}">Delete</a>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% include '_pagination.html' %}
+  {% else %}
+    <div class="empty">
+      <p>No teams yet. Add one to start the directory.</p>
+      <a class="btn" href="{% url 'team_create' %}">Add a team</a>
+    </div>
+  {% endif %}
 {% endblock %}

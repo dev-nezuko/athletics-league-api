@@ -9,11 +9,19 @@ from django.views import View
 from django.shortcuts import render, redirect
 from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.messages.views import SuccessMessageMixin
 from .forms import TeamForm, PlayerForm
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.views import LoginView
 from django.contrib.auth import logout
 from .models import Team, Player
+
+
+class NamedSuccessMessageMixin(SuccessMessageMixin):
+    """Fill %(name)s from the saved or deleted object rather than the form data."""
+
+    def get_success_message(self, cleaned_data):
+        return self.success_message % {"name": self.object}
 
 
 class HomeView(LoginRequiredMixin, View):
@@ -34,24 +42,27 @@ class TeamListView(LoginRequiredMixin, ListView):
     queryset = Team.objects.order_by("city", "mascot", "pk")
 
 
-class TeamCreateView(LoginRequiredMixin, CreateView):
+class TeamCreateView(LoginRequiredMixin, NamedSuccessMessageMixin, CreateView):
     model = Team
     form_class = TeamForm
     template_name = "team_form.html"
     success_url = reverse_lazy("team_list")
+    success_message = "Added %(name)s."
 
 
-class TeamUpdateView(LoginRequiredMixin, UpdateView):
+class TeamUpdateView(LoginRequiredMixin, NamedSuccessMessageMixin, UpdateView):
     model = Team
     form_class = TeamForm
     template_name = "team_form.html"
     success_url = reverse_lazy("team_list")
+    success_message = "Saved %(name)s."
 
 
-class TeamDeleteView(LoginRequiredMixin, DeleteView):
+class TeamDeleteView(LoginRequiredMixin, NamedSuccessMessageMixin, DeleteView):
     model = Team
     template_name = "team_confirm_delete.html"
     success_url = reverse_lazy("team_list")
+    success_message = "Deleted %(name)s."
 
 
 class TeamDetailView(LoginRequiredMixin, DetailView):
@@ -73,24 +84,27 @@ class PlayerListView(LoginRequiredMixin, ListView):
     queryset = Player.objects.prefetch_related("teams").order_by("last_name", "first_name", "pk")
 
 
-class PlayerCreateView(LoginRequiredMixin, CreateView):
+class PlayerCreateView(LoginRequiredMixin, NamedSuccessMessageMixin, CreateView):
     model = Player
     form_class = PlayerForm
     template_name = "player_form.html"
     success_url = reverse_lazy("player_list")
+    success_message = "Added %(name)s."
 
 
-class PlayerUpdateView(LoginRequiredMixin, UpdateView):
+class PlayerUpdateView(LoginRequiredMixin, NamedSuccessMessageMixin, UpdateView):
     model = Player
     form_class = PlayerForm
     template_name = "player_form.html"
     success_url = reverse_lazy("player_list")
+    success_message = "Saved %(name)s."
 
 
-class PlayerDeleteView(LoginRequiredMixin, DeleteView):
+class PlayerDeleteView(LoginRequiredMixin, NamedSuccessMessageMixin, DeleteView):
     model = Player
     template_name = "player_confirm_delete.html"
     success_url = reverse_lazy("player_list")
+    success_message = "Deleted %(name)s."
 
 
 class PlayerDetailView(LoginRequiredMixin, DetailView):
@@ -99,10 +113,11 @@ class PlayerDetailView(LoginRequiredMixin, DetailView):
     context_object_name = "player"
 
 
-class SignUpView(CreateView):
+class SignUpView(SuccessMessageMixin, CreateView):
     form_class = UserCreationForm
     success_url = reverse_lazy("login")
     template_name = "signup.html"
+    success_message = "Account created. Log in to continue."
 
     def dispatch(self, request, *args, **kwargs):
         if request.user.is_authenticated:

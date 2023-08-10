@@ -1,10 +1,15 @@
 {% extends 'base.html' %}
-
+{% block title %}Create an account{% endblock %}
 {% block content %}
-    <h1>Register</h1>
-    <form method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit">Register</button>
+  <p class="eyebrow">Club roster</p>
+  <h1>Create an account</h1>
+  <div class="panel">
+    {% include '_form_errors.html' %}
+    <form method="post" novalidate>
+      {% csrf_token %}
+      {{ form.as_div }}
+      <button type="submit">Create account</button>
     </form>
+    <p>Already registered? <a href="{% url 'login' %}">Log in</a>.</p>
+  </div>
 {% endblock %}
