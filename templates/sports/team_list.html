@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <h1>Teams</h1>
+  <p><a href="{% url 'team_create' %}">Add a team</a></p>
+  <div class="table-wrap"><table class="table">
+    <thead class="thead-dark">
+      <tr>
+        <th scope="col">City</th>
+        <th scope="col">Mascot</th>
+        <th scope="col">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for team in teams %}
+        <tr>
+          <th scope="row"><a href="{% url 'team_detail' team.pk %}">{{ team.city }}</a></th>
+          <td>{{ team.mascot }}</td>
+          <td>
+            <a class="text-warning" href="{% url 'team_update' team.pk %}">Edit</a>
+            <a class="text-danger" href="{% url 'team_delete' team.pk %}">Delete</a>
+          </td>
+        </tr>
+      {% empty %}<tr><td colspan="3">No teams yet. Add one to start the directory.</td></tr>{% endfor %}
+
+    </tbody>
+  </table></div>
+  
+{% endblock %}
