@@ -3,6 +3,7 @@
 {% block content %}
   <div class="roster-home">
     <h1>Teams and Players</h1>
+    <p>{{ team_count }} team{{ team_count|pluralize }}, {{ player_count }} player{{ player_count|pluralize }}, {{ unassigned_count }} without a team.</p>
     <a type="button" class="btn btn-primary" href="{% url 'team_create' %}">Add a team</a>
     <a type="button" class="btn btn-primary" href="{% url 'player_create' %}">Add a Player</a>
   </div>

@@ -18,13 +18,19 @@ from .models import Team, Player
 
 class HomeView(LoginRequiredMixin, View):
     def get(self, request):
-        return render(request, "index.html")
+        context = {
+            "team_count": Team.objects.count(),
+            "player_count": Player.objects.count(),
+            "unassigned_count": Player.objects.filter(teams__isnull=True).count(),
+        }
+        return render(request, "index.html", context)
 
 
 class TeamListView(LoginRequiredMixin, ListView):
     model = Team
     template_name = "team_list.html"
     context_object_name = "teams"
+    paginate_by = 25
     queryset = Team.objects.order_by("city", "mascot", "pk")
 
 
@@ -53,11 +59,17 @@ class TeamDetailView(LoginRequiredMixin, DetailView):
     template_name = "team_detail.html"
     context_object_name = "team"
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["roster"] = self.object.player_set.order_by("last_name", "first_name")
+        return context
+
 
 class PlayerListView(LoginRequiredMixin, ListView):
     model = Player
     template_name = "player_list.html"
     context_object_name = "players"
+    paginate_by = 25
     queryset = Player.objects.prefetch_related("teams").order_by("last_name", "first_name", "pk")
 
 

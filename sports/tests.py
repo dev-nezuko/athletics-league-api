@@ -1,4 +1,7 @@
+from io import StringIO
+
 from django.contrib.auth.models import AnonymousUser, User
+from django.core.management import call_command
 from django.test import Client, RequestFactory, TestCase, override_settings
 from django.urls import reverse
 
@@ -89,3 +92,62 @@ class PlayerFormTests(TestCase):
         player.teams.add(team)
         response = self.client.get(reverse("team_detail", args=[team.pk]))
         self.assertContains(response, reverse("player_detail", args=[player.pk]))
+
+
+class DirectoryFeatureTests(TestCase):
+    def setUp(self):
+        user = User.objects.create_user("demo-coach", password="local-test-password")
+        self.client.force_login(user)
+
+    def test_home_summarises_directory_counts(self):
+        Player.objects.create(first_name="Ash", last_name="Nobody")
+        response = self.client.get(reverse("home"))
+        self.assertEqual(response.context["player_count"], 1)
+        self.assertEqual(response.context["unassigned_count"], 1)
+
+    def test_team_create_update_delete_flow(self):
+        self.client.post(reverse("team_create"), {"city": "Fenwick", "mascot": "Foxes"})
+        team = Team.objects.get(city="Fenwick")
+        self.client.post(
+            reverse("team_update", args=[team.pk]), {"city": "Fenwick", "mascot": "Owls"}
+        )
+        team.refresh_from_db()
+        self.assertEqual(team.mascot, "Owls")
+        response = self.client.post(reverse("team_delete", args=[team.pk]))
+        self.assertRedirects(response, reverse("team_list"))
+        self.assertFalse(Team.objects.exists())
+
+    def test_player_update_changes_memberships(self):
+        team = Team.objects.create(city="Fenwick", mascot="Foxes")
+        player = Player.objects.create(first_name="Ash", last_name="Nobody")
+        self.client.post(
+            reverse("player_update", args=[player.pk]),
+            {"first_name": "Ash", "last_name": "Nobody", "teams": [team.pk]},
+        )
+        self.assertEqual(list(player.teams.all()), [team])
+
+    def test_player_list_is_paginated(self):
+        Player.objects.bulk_create(
+            Player(first_name="Demo", last_name=f"Runner {n:02d}") for n in range(30)
+        )
+        first = self.client.get(reverse("player_list"))
+        self.assertEqual(len(first.context["players"]), 25)
+        self.assertContains(first, "Page 1 of 2")
+        second = self.client.get(reverse("player_list"), {"page": 2})
+        self.assertEqual(len(second.context["players"]), 5)
+
+    def test_team_roster_is_sorted_by_surname(self):
+        team = Team.objects.create(city="Fenwick", mascot="Foxes")
+        for last_name in ("Zeller", "Abbot"):
+            Player.objects.create(first_name="Demo", last_name=last_name).teams.add(team)
+        response = self.client.get(reverse("team_detail", args=[team.pk]))
+        self.assertEqual([p.last_name for p in response.context["roster"]], ["Abbot", "Zeller"])
+
+
+class SeedDemoCommandTests(TestCase):
+    def test_seed_is_idempotent(self):
+        call_command("seed_demo", stdout=StringIO())
+        call_command("seed_demo", stdout=StringIO())
+        self.assertEqual(Team.objects.count(), 4)
+        self.assertEqual(Player.objects.count(), 9)
+        self.assertTrue(Player.objects.filter(teams__isnull=True).exists())

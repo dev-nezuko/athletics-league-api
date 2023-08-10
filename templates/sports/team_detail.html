@@ -7,7 +7,7 @@
 
   <h2>Players:</h2>
   <ul>
-    {% for player in team.player_set.all %}
+    {% for player in roster %}
       <li><a href="{% url 'player_detail' player.pk %}">{{ player.first_name }} {{ player.last_name }}</a></li>
     {% empty %}
       <li>No players currently on this team</li>
