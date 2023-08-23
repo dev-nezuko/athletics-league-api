@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <h1>Players</h1>
+  <p><a href="{% url 'player_create' %}">Add new player</a></p>
+  <table class="table">
+    <thead class="thead-dark">
+      <tr>
+        <th scope="col">First Name</th>
+        <th scope="col">Last Name</th>
+        <th scope="col">Teams</th>
+        <th scope="col">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for player in players %}
+        <tr>
+          <th scope="row">{{ player.first_name }}</th>
+          <td>{{ player.last_name }}</td>
+          <td>
+            {% for team in player.teams.all %}
+              {{ team.city }} {{ team.mascot }}{% if not forloop.last %}, {% endif %}
+            {% endfor %}
+          </td>
+          <td>
+            <a class="text-info" href="{% url 'player_detail' player.id %}">Details</a>
+            <a class="text-warning" href="{% url 'player_update' player.id %}">Edit</a>
+            <a class="text-danger" href="{% url 'player_delete' player.id %}">Delete</a>
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% endblock %}

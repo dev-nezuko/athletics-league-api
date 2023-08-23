@@ -1,0 +1,9 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <div class="position-absolute top-0 start-50 translate-middle">
+    <h1>Teams and Players</h1>
+    <a type="button" class="btn btn-primary" href="{% url 'team_create' %}">Add a team</a>
+    <a type="button" class="btn btn-primary" href="{% url 'player_create' %}">Add a Player</a>
+  </div>
+{% endblock %}

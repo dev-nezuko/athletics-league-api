@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <h1>Team Detail</h1>
+  <p><strong>City:</strong> {{ team.city }}</p>
+  <p><strong>Mascot:</strong> {{ team.mascot }}</p>
+
+  <h2>Players:</h2>
+  <ul>
+    {% for player in team.players.all %}
+      <li>{{ player.first_name }} {{ player.last_name }}</li>
+    {% empty %}
+      <li>No players currently on this team</li>
+    {% endfor %}
+  </ul>
+
+  <a href="{% url 'team_update' team.id %}">Update</a>
+  <a href="{% url 'team_delete' team.id %}">Delete</a>
+{% endblock %}

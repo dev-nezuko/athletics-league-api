@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sports App</title>
+</head>
+<body>
+    <header>
+    <!--Navbar-->
+    <nav class="navbar navbar-expand-sm navbar-light bg-light">
+        <a class="navbar-brand" href="{% url 'team_list' %}">E2E Innovations</a>
+        
+        <div class="collapse navbar-collapse" id="navbarText">
+          <ul class="navbar-nav mr-auto">
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'team_list' %}">Home</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'team_list' %}">Team</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'team_create' %}">Create team</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'player_list' %}">Player</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'player_create' %}">Create player</a>
+            </li>
+          </ul>
+					{% if user.is_authenticated %}
+						<span class="navbar-text">
+							Username: {{ user.username }}
+						</span>
+						<a class="btn btn-outline-success mx-2 my-2 my-sm-0" href="{% url 'logout' %}" type="submit">Logout</a>
+
+            
+        {% else %}
+						<a class="btn btn-outline-warning my-2 my-sm-0" href="{% url 'login' %}" type="submit">Login</a>
+						<a class="btn btn-outline-danger mx-2 my-2 my-sm-0" href="{% url 'signup' %}" type="submit">Signup</a>
+
+        {% endif %}
+        </div>
+      
+      </nav>
+        
+    </header>
+		<div class="container mt-5">
+			{% if user.is_authenticated %}
+			{% block content %}{% endblock %}
+			{%else%}
+			{% block login %}{% endblock %}
+
+			{% endif %}
+			{% block error %}{% endblock %}
+		</div>
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script>
+</body>
+</html>
