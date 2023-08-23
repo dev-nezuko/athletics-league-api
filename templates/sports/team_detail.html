@@ -7,7 +7,7 @@
 
   <h2>Players:</h2>
   <ul>
-    {% for player in team.players.all %}
+    {% for player in team.player_set.all %}
       <li>{{ player.first_name }} {{ player.last_name }}</li>
     {% empty %}
       <li>No players currently on this team</li>

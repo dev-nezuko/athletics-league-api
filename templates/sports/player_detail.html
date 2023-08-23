@@ -1,0 +1,4 @@
+{% extends 'base.html' %}
+{% block content %}<p class="eyebrow">Player profile</p><h1>{{ player.first_name }} {{ player.last_name }}</h1>
+<h2>Teams</h2><ul>{% for team in player.teams.all %}<li><a href="{% url 'team_detail' team.pk %}">{{ team }}</a></li>{% empty %}<li>No team memberships.</li>{% endfor %}</ul>
+<a href="{% url 'player_update' player.pk %}">Edit player</a> · <a href="{% url 'player_list' %}">Back to players</a>{% endblock %}

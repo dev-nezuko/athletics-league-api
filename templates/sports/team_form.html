@@ -1,10 +1,1 @@
-{% extends "base.html" %}
-
-{% block content %}
-  <h1>Create a new object</h1>
-  <form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <input type="submit" value="Create">
-  </form>
-{% endblock %}
+{% extends 'base.html' %}{% block content %}<p class="eyebrow">Roster management</p><h1>{% if object %}Edit{% else %}Add{% endif %} team</h1><form method="post">{% csrf_token %}{{ form.as_p }}<button>Save team</button></form>{% endblock %}

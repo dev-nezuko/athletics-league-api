@@ -25,6 +25,7 @@ class TeamListView(LoginRequiredMixin, ListView):
     model = Team
     template_name = "team_list.html"
     context_object_name = "teams"
+    queryset = Team.objects.order_by("city", "mascot", "pk")
 
 
 class TeamCreateView(LoginRequiredMixin, CreateView):
@@ -57,6 +58,7 @@ class PlayerListView(LoginRequiredMixin, ListView):
     model = Player
     template_name = "player_list.html"
     context_object_name = "players"
+    queryset = Player.objects.prefetch_related("teams").order_by("last_name", "first_name", "pk")
 
 
 class PlayerCreateView(LoginRequiredMixin, CreateView):
@@ -98,14 +100,14 @@ class LoginView(LoginView):
 
 
 class LogoutView(LoginRequiredMixin, View):
-    def get(self, request, *args, **kwargs):
+    def post(self, request, *args, **kwargs):
         logout(request)
         return redirect(reverse_lazy("login"))
 
 
 def custom_404_view(request, exception):
-    return render(request, "404.html")
+    return render(request, "404.html", status=404)
 
 
 def custom_500_view(request):
-    return render(request, "500.html")
+    return render(request, "500.html", status=500)

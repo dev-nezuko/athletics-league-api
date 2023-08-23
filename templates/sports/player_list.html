@@ -3,7 +3,7 @@
 {% block content %}
   <h1>Players</h1>
   <p><a href="{% url 'player_create' %}">Add new player</a></p>
-  <table class="table">
+  <div class="table-wrap"><table class="table">
     <thead class="thead-dark">
       <tr>
         <th scope="col">First Name</th>
@@ -28,7 +28,7 @@
             <a class="text-danger" href="{% url 'player_delete' player.id %}">Delete</a>
           </td>
         </tr>
-      {% endfor %}
+      {% empty %}<tr><td colspan="4">No players yet. Add one to start the directory.</td></tr>{% endfor %}
     </tbody>
-  </table>
+  </table></div>
 {% endblock %}
